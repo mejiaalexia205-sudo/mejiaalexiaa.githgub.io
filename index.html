@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smash Suroeste</title>
+  <link rel="stylesheet" href="juego.css" />
+</head>
+<body>
+
+  <audio id="musicaFondo" src="audio/musica.mp3" autoplay loop></audio>
+
+
+
+<!--------- PANTALLAS INICIALES --------->
+  
+<!-- Pantalla de inicio -->
+  <div id="inicio" class="pantalla activa">
+    <div class="fondo fondo-general" style="filter:blur(3px);"></div>
+    <img id="logo" src="img/logo-smash.png" alt="Logo Smash Suroeste">
+
+    <!-- Botón animado (oculto al inicio) -->
+  <button id="btnComenzar" onclick="mostrarPantalla('nombre')" style="display:none;">
+    <img src="img/boton-jugar.png" alt="Comenzar">
+  </button>
+  </div>
+  </div>
+
+
+  <!-- Pantalla ingresar nombre -->
+  <div id="nombre" class="pantalla">
+    <div class="fondo fondo-general" style="filter:blur(3px);"></div>
+    <div class="caja caja-nombre">
+
+      <strong class="titulo-nombre">Ingresa tu nombre</strong>
+      
+      
+      <input type="text" id="jugador" placeholder="Tu nombre">
+      <br>
+      <br>
+      <button onclick="guardarNombre()">Siguiente</button>
+    </div>
+  </div>
+
+
+<!-- Pantalla bienvenida -->
+  <div id="bienvenida" class="pantalla">
+    <div class="fondo fondo-general" style="filter:blur(3px);"></div>
+    <div class="fila">
+      <img src="img/iktan.png" alt="Iktan" class="iktan">
+      <div class="caja">
+        <p class="texto-grande">
+          <strong style="font-size:40px;">¡Bienvenid@, <span id="nombreJugador"></span>!</strong><br><br>
+          A mi hogar: la región suroeste de México!<br>
+          Soy Iktan y seré tu guía en esta aventura.<br>
+          ¿Estás list@ para comenzar?
+        </p>
+        <button onclick="mostrarPantalla('reglas')">Siguiente</button>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- Pantalla reglas -->
+  <div id="reglas" class="pantalla">
+    <div class="fondo fondo-general" style="filter:blur(3px);"></div>
+    <div class="fila">
+      <div class="caja">
+        <strong style="font-size:40px;">Reglas del Juego</strong>
+        <p class="texto-grande">
+          Te explicaré rápidamente las reglas:<br>
+          Viajaremos por Guerrero, Oaxaca y Chiapas.<br>
+          En cada estado deberás responder 2 preguntas para avanzar.<br><br>
+          Ganarás estrellas y, si juntas las suficientes...<br>
+          ¡habrá un premio al final!
+        </p>
+        <button onclick="mostrarPantalla('mapa')">Comenzar</button>
+      </div>
+      <img src="img/iktan2.png" alt="Iktan pequeño" class="iktan">
+    </div>
+  </div>
+
+
+
+<!-- Pantalla mapa interactivo -->
+  <div id="mapa" class="pantalla">
+    <div class="fondo" style="background-image:url('img/fondo-Chiapas.png');"></div>
+      <!-- Jaguar (primer nivel) -->
+      <div class="personaje" style="top:63%; left:80%;">
+        <img id="jaguarImg" src="img/jaguar-chiapas.png" alt="Jaguar Chiapas">
+      </div>
+      <!-- Mujer (segundo nivel) -->
+      <div class="personaje" style="top:50%; left:68%;">
+        <img id="mujerImg" src="img/mujer-chiapas.png" alt="Mujer Chiapas">
+      </div>
+      <!-- Logo arriba a la izquierda -->
+      <div class="logo">
+        <img src="img/logo-smash.png" alt="Logo Smash">
+      </div>
+      <!-- Puntuación arriba a la derecha -->
+      <div class="puntuacion">
+        <img src="img/estrella.png" alt="Estrella">
+        <span id="score">0</span>
+      </div>
+
+
+
+
+
+<!--------- LÓGICA DE CHIAPAS --------->
+
+<!-- Mensaje de bienvenida con Iktan (oculto al inicio, se muestra por JS) -->
+    <div id="mensajeBienvenida" class="mensaje">
+      <div class="mensaje-inner">
+        <div class="mensaje-texto">
+          <p>
+            <strong>¡Has llegado a Chiapas!</strong><br><br>
+            Da clic en los objetos que representan al estado para desbloquear la pregunta y ganar puntos.<br>
+            Responde bien para seguir avanzando.<br><br>
+            <strong>¡Mucha suerte!</strong>
+          </p>
+          <button onclick="cerrarMensaje()">Entendido</button>
+        </div>
+        <img src="img/iktan-chiapas.png" alt="Iktan" class="mensaje-iktan">
+      </div>
+    </div>
+
+
+<!-- Pantalla de dato curioso en Chiapas -->
+    <div id="datoCuriosoChiapas" class="pantalla-dato">
+      <div class="fondo" style="background-image:url('img/mapa-suroeste.png');"></div>
+      <div class="contenido-curioso">
+        <img src="img/iktan-curioso.png" alt="Iktan señalando" class="iktan-curioso">
+        <div class="pizarra-curiosa">
+          <p id="textoCuriosoChiapas"></p>
+          <img src="img/carga-dato.gif" alt="Cargando dato" class="barra-carga">
+        </div>
+      </div>
+    </div>
+
+
+<!-- Pantalla de pregunta sobre Chiapas -->
+    <div id="preguntaChiapas" class="pantalla-pregunta">
+      <div class="fondo"></div>
+      <div class="contenedor-pregunta">
+        <p id="textoPreguntaChiapas" class="pregunta-texto"></p>
+        <p id="cronometro" class="cronometro"></p> <!-- ← aquí va el contador -->
+        <form id="formularioPreguntaChiapas">
+          <label><input type="radio" name="respuesta" value="A"> <span id="opcionA"></span></label><br>
+          <label><input type="radio" name="respuesta" value="B"> <span id="opcionB"></span></label><br>
+          <label><input type="radio" name="respuesta" value="C"> <span id="opcionC"></span></label><br>
+          <button type="submit">Enviar respuesta</button>
+        </form>
+      </div>
+    </div>
+
+
+<!-- Pantalla: Dato curioso Mujer -->
+    <div id="datoCuriosoMujer" class="pantalla-dato">
+      <div class="fondo" style="background-image:url('img/mapa-suroeste.png');"></div>
+      <div class="contenido-curioso">
+        <img src="img/iktan-curioso.png" alt="Iktan señalando" class="iktan-curioso">
+        <div class="pizarra-curiosa">
+          <p id="textoCuriosoMujer"></p>
+          <img src="img/carga-dato.gif" alt="Cargando dato" class="barra-carga">
+        </div>
+      </div>
+    </div>
+
+
+<!-- Pantalla: Pregunta Mujer -->
+    <div id="preguntaMujer" class="pantalla-pregunta">
+      <div class="fondo"></div>
+      <div class="contenedor-pregunta">
+        <p id="textoPreguntaMujer" class="pregunta-texto"></p>
+        <p id="cronometroMujer" class="cronometro"></p>
+        <form id="formularioPreguntaMujer">
+          <label><input type="radio" name="respuesta" value="A"> <span id="opcionAMujer"></span></label><br>
+          <label><input type="radio" name="respuesta" value="B"> <span id="opcionBMujer"></span></label><br>
+          <label><input type="radio" name="respuesta" value="C"> <span id="opcionCMujer"></span></label><br>
+          <button type="submit">Responder</button>
+        </form>
+      </div>
+    </div>
+
+
+
+
+
+<!--------- PANTALLAS DE MENSAJES   --------->
+
+<!-- Pantalla: Intenta de nuevo -->
+    <div id="mensajeIntentaDeNuevo" class="pantalla-intento">
+    <div class="fondo" style="background-image:url('img/mapa-suroeste.png');"></div>  <div class="contenido-intento">
+        <img src="img/iktan-triste.png" alt="Iktan triste" class="iktan-intento">
+        <div class="mensaje-intento">
+          <p>¡Ups! No fue la respuesta correcta<br>
+          Pero no te preocupes,<br>
+          <strong>¡Inténtalo de nuevo, tú puedes!</strong></p>
+          <button onclick="cerrarMensajeIntenta()">Intentar de nuevo</button>
+        </div>
+      </div>
+    </div>
+
+
+<!-- Pantalla: Se te acabó el tiempo -->
+      <div id="mensajeTiempoAgotado" class="pantalla-intento">
+        <div class="fondo" style="background-image:url('img/mapa-suroeste.png');"></div>
+        <div class="contenido-intento">
+          <img src="img/iktan-triste.png" alt="Iktan sorprendido" class="iktan-intento">
+          <div class="mensaje-intento">
+            <p>¡Se te acabó el tiempo! ⏰<br>
+            Pero no pasa nada,<br>
+            <strong>¡Inténtalo de nuevo, tú puedes!</strong></p>
+            <button onclick="cerrarMensajeTiempo()">Intentar de nuevo</button>
+          </div>
+        </div>
+      </div>
+
+
+
+<!-- Pantalla: 20 puntos -->
+    <div id="pantalla20puntos" class="pantalla-puntos">
+      <div class="fondo" style="background-image:url('img/mapa-suroeste.png');"></div>
+      <div class="contenido-puntos">
+        <img src="img/iktan-20.png" alt="Iktan feliz" class="iktan-puntos">
+        <div class="mensaje-puntos">
+          <p><strong>¡Perfecto, <span id="nombre20puntos"></span>!</strong><br>
+          Respondiste muy bien.<br>
+          <span class="estrella">⭐ +20</span></p>
+          <p id="retro20puntos" class="retro-texto"></p>
+          <button onclick="cerrarPantalla20()">Regresar</button>
+        </div>
+      </div>
+    </div>
+
+
+<!-- Pantalla: 15 puntos -->
+    <div id="pantalla15puntos" class="pantalla-puntos">
+      <div class="fondo" style="background-image:url('img/mapa-suroeste.png');"></div>
+      <div class="contenido-puntos">
+        <img src="img/iktan-15.png" alt="Iktan feliz" class="iktan-puntos">
+        <div class="mensaje-puntos">
+          <p><strong>¡Excelente, <span id="nombre15puntos"></span>!</strong><br>
+          Respondiste muy bien.<br>
+          <span class="estrella">⭐ +15</span></p>
+          <p id="retro15puntos" class="retro-texto"></p>
+          <button onclick="cerrarPantalla15()">Regresar</button>
+        </div>
+      </div>
+    </div>
+
+
+<!-- Pantalla: 10 puntos -->
+    <div id="pantalla10puntos" class="pantalla-puntos">
+      <div class="fondo" style="background-image:url('img/mapa-suroeste.png');"></div>
+      <div class="contenido-puntos">
+        <img src="img/iktan-10.png" alt="Iktan sonriente" class="iktan-puntos">
+        <div class="mensaje-puntos">
+          <p><strong>¡Muy bien, <span id="nombre10puntos"></span>!</strong><br>
+          Lo lograste con esfuerzo.<br>
+          <span class="estrella">⭐ +10</span></p>
+          <p id="retro10puntos" class="retro-texto"></p>
+          <button onclick="cerrarPantalla10()">Regresar</button>
+        </div>
+      </div>
+    </div>
+
+
+
+
+<!--------- LÓGICA DE OAXACA --------->
+
+<!-- Pantalla de inicio + Bienvenida -->
+<div id="pantallaOaxaca" class="pantalla">
+  <!-- Paso 1: fondo del mapa -->
+  <div id="mapaOaxaca" class="fondo" style="background-image:url('img/mapa-oaxaca.png');"></div>
+
+  <!-- Paso 2: íconos ocultos al inicio -->
+  <div id="iconosOaxaca" class="iconos-oaxaca" style="display:none;">
+    <!-- Ave -->
+    <img id="aveOaxaca" src="img/icono-ave.png" class="icono-oaxaca" style="top:48%; left:36%;">
+    <!-- Botella -->
+    <img id="botellaOaxaca" src="img/icono-botella.png" class="icono-oaxaca" style="top:50%; left:48%;">
+  </div>
+
+  <!-- Paso 3: bienvenida oculta al inicio -->
+  <div id="bienvenidaOaxaca" class="mensaje">
+    <div class="mensaje-inner">
+      <img src="img/iktan-oaxaca.png" alt="Iktan Oaxaca" class="mensaje-iktan">
+      <div class="mensaje-texto">
+        <p>
+          <strong>¡Has llegado a Oaxaca!</strong><br><br>
+          Tierra de tradición y color.<br>
+          Da clic en los objetos para responder las preguntas y ganar puntos.<br><br>
+          <strong>¡Mucha suerte!</strong>
+        </p>
+        <button onclick="iniciarNivelOaxaca()">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  
+<!-- Íconos Guerrero (ocultos al inicio) -->
+  <div id="iconosGuerrero" class="iconos-guerrero" style="display:none;">
+    <img id="iconoAcapulco" src="img/icono-acapulco.png" class="icono-guerrero" style="top:44%; left:23%;">
+    <img id="iconoTigre" src="img/icono-tigre.png" class="icono-guerrero" style="top:38%; left:11%;">
+  </div>
+
+<div id="bienvenidaGuerrero" class="mensaje" style="display:none; ">
+  <div class="mensaje-inner" style="flex:1; margin:0;">
+      <img src="img/iktan-guerrero.png" alt="Iktan Guerrero" class="mensaje-iktan derecha">
+      <div class="mensaje-texto">
+        <p>
+          <strong>
+          <span style="color:orange; font-size:28px;">
+            ¡Has llegado a Guerrero!
+          </span>
+        </strong>
+          
+          <br><br>
+          Estado de playas, montañas y gran diversidad cultural.<br>
+          Da clic en los objetos para responder las preguntas y ganar puntos.<br><br>
+          <strong>¡Mucha suerte!</strong>
+        </p>
+        <button onclick="iniciarNivelGuerrero()">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+
+  
+
+
+
+
+<!-- Pantalla: Dato curioso curioso en Oaxaca -->
+    <div id="datoCuriosoOaxaca" class="pantalla-dato">
+      <div class="fondo" style="background-image:url('img/mapa-suroeste.png');"></div>
+      <div class="contenido-curioso">
+        <img src="img/iktan-curioso.png" alt="Iktan señalando" class="iktan-curioso">
+        <div class="pizarra-curiosa">
+          <p id="textoCuriosoOaxaca"></p>
+          <img src="img/carga-dato.gif" alt="Cargando dato" class="barra-carga">
+        </div>
+      </div>
+    </div>
+
+
+
+<!-- Pantalla: Pregunta Oaxaca -->
+<div id="preguntaOaxaca" class="pantalla-pregunta">
+  <div class="fondo"></div>
+  <div class="contenedor-pregunta">
+    <p id="textoPreguntaOaxaca" class="pregunta-texto"></p>
+    <p id="cronometroOaxaca" class="cronometro"></p>
+    <form id="formularioPreguntaOaxaca">
+      <label><input type="radio" name="respuesta" value="A"> <span id="opcionAOaxaca"></span></label><br>
+      <label><input type="radio" name="respuesta" value="B"> <span id="opcionBOaxaca"></span></label><br>
+      <label><input type="radio" name="respuesta" value="C"> <span id="opcionCOaxaca"></span></label><br>
+      <button type="submit">Enviar respuesta</button>
+    </form>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+<!--------- LÓGICA DE GUERRERO --------->
+
+<!-- Pantalla de inicio + Bienvenida -->
+<div id="pantallaGuerrero" class="pantalla" style="display:none;">
+  <!-- Paso 1: fondo del mapa -->
+  <div id="mapaGuerrero" class="fondo" style="background-image:url('img/mapa-guerrero.png');"></div>
+
+  <!-- Paso 2: íconos ocultos al inicio -->
+  <div id="iconosGuerrero" class="iconos-guerrero" style="display:none;">
+    <!-- Acapulco -->
+    <img id="iconoAcapulco" src="img/icono-acapulco.png" class="icono-guerrero" style="top:51%; left:25%;">
+    <!-- Tigre -->
+    <img id="iconoTigre" src="img/icono-tigre.png" class="icono-guerrero" style="top:54%; left:50%;">
+  </div>
+
+  
+</div>
+
+
+
+
+
+
+
+<!-- Pantalla: Dato curioso en Guerrero -->
+<div id="datoCuriosoGuerrero" class="pantalla-dato">
+  <div class="fondo" style="background-image:url('img/mapa-suroeste.png');"></div>
+  <div class="contenido-curioso">
+    <img src="img/iktan-curioso.png" alt="Iktan señalando" class="iktan-curioso">
+    <div class="pizarra-curiosa">
+      <p id="textoCuriosoGuerrero"></p>
+      <img src="img/carga-dato.gif" alt="Cargando dato" class="barra-carga">
+    </div>
+  </div>
+</div>
+
+
+<!-- Pantalla: Pregunta Guerrero -->
+<div id="preguntaGuerrero" class="pantalla-pregunta">
+  <div class="fondo"></div>
+  <div class="contenedor-pregunta">
+    <p id="textoPreguntaGuerrero" class="pregunta-texto"></p>
+    <p id="cronometroGuerrero" class="cronometro"></p>
+    <form id="formularioPreguntaGuerrero">
+      <label><input type="radio" name="respuesta" value="A"> <span id="opcionAGuerrero"></span></label><br>
+      <label><input type="radio" name="respuesta" value="B"> <span id="opcionBGuerrero"></span></label><br>
+      <label><input type="radio" name="respuesta" value="C"> <span id="opcionCGuerrero"></span></label><br>
+      <button type="submit">Enviar respuesta</button>
+    </form>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+<!--------- MENSAJE DEL PODIO FINAL Y DESPEDIDA --------->
+
+<div id="pantallaPrimerLugar" class="pantalla-final">
+
+  <!-- Confeti -->
+  <img src="img/confeti-izquierda.gif" alt="Confeti izquierda" class="confeti confeti-izquierda">
+  <img src="img/confeti-derecha.gif" alt="Confeti derecha" class="confeti confeti-derecha">
+
+  <!-- Imagen de Iktan -->
+  <img src="img/iktan-primerlugar.png" alt="Iktan celebrando" class="podio-img-externa">
+
+  <div class="contenedor-podio">
+    <div class="podio-text">
+      <h1>
+        ¡Felicidades, <span class="nombreJugadorFinal"></span>!
+      </h1>
+
+      <p>
+        Has completado el recorrido por mi hogar y aprendido sobre la riqueza de
+        Chiapas, Oaxaca y Guerrero.
+      </p>
+
+      <!--  Score -->
+      <div class="podio-score">
+        <img src="img/estrella.png" alt="Estrella" class="estrella-icon">
+        <span id="scoreFinal"></span>
+      </div>
+
+      <button onclick="mostrarDespedidaIktan()">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+  <script src="juego2.js" defer></script>
+</body>
+</html>
